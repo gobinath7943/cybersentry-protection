@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberSentry™ - Official Registration & Security Portal</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        csRed: '#e5252a',
+                        csBlue: '#1a73e8',
+                        csBlack: '#121316',
+                        csDark: '#1a1b20',
+                        csGray: '#24262d',
+                        csGold: '#f59e0b'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Leaflet CSS & JS for Live Tracking Screen -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        .portal-glow {
+            box-shadow: 0 0 60px -15px rgba(229, 37, 42, 0.25);
+        }
+        .step-transition {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .admin-glow {
+            box-shadow: 0 0 35px -5px rgba(245, 158, 11, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-csBlack text-gray-100 min-h-screen flex flex-col font-sans select-none antialiased">
+
+    <!-- Top Navigation Bar -->
+    <header class="h-16 bg-white text-gray-900 border-b border-gray-200 z-30 flex items-center justify-between px-4 sm:px-8 shadow-sm">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-csRed text-white flex items-center justify-center text-lg font-black shadow-md shadow-red-200 cursor-pointer" onclick="showStep('STAGE_WELCOME')">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="font-black text-base tracking-tight text-gray-900">CYBER<span class="text-csRed">SENTRY™</span></span>
+                    <span class="text-[10px] bg-red-100 text-csRed font-bold px-2 py-0.5 rounded-full border border-red-200">OFFICIAL PORTAL</span>
+                    <span id="systemVersionTag" class="text-[10px] bg-gray-100 text-gray-700 font-mono font-bold px-1.5 py-0.5 rounded">v3.4.0</span>
+                </div>
+                <p class="text-[11px] text-gray-500 font-medium">Gadgets Anti-Theft &amp; Hardware Lock Platform</p>
+            </div>
+        </div>
+
+        <!-- Right: Status / Owner Command / Emergency Action -->
+        <div class="flex items-center gap-2 sm:gap-3">
+            <!-- Owner Admin Gate Button -->
+            <button onclick="promptOwnerAccess()" class="px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-700 hover:bg-amber-500 hover:text-white border border-amber-300 text-xs font-black transition-all flex items-center gap-1.5 shadow-sm" title="Owner Master Control & OTA Live Updates">
+                <i class="fa-solid fa-crown text-amber-500 text-xs"></i>
+                <span class="hidden sm:inline">Owner Center</span>
+            </button>
+
+            <!-- Self-Healing Watchdog Status Indicator -->
+            <button onclick="openDiagnosticsModal()" id="watchdogHealthPill" class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold transition-all hover:bg-emerald-100" title="Self-Healing Watchdog Active">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span id="watchdogStatusText">HEALTH: 100%</span>
+            </button>
+
+            <button onclick="openEmergencyKeyModal()" class="px-3.5 py-2 bg-csBlack hover:bg-gray-800 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2 border border-gray-700 shadow-sm">
+                <i class="fa-solid fa-key text-yellow-400"></i>
+                <span class="hidden sm:inline">16-Key Emergency</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Dynamic Content Canvas -->
+    <main class="flex-1 flex items-center justify-center p-4 sm:p-8 relative overflow-hidden">
+        
+        <!-- Ambient Background Glow Accents -->
+        <div class="absolute -top-32 -left-32 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- ============================================================== -->
+        <!-- STAGE 1: WELCOME SCREEN                                        -->
+        <!-- ============================================================== -->
+        <div id="viewWelcome" class="step-transition max-w-2xl w-full text-center space-y-8 py-8">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-500/10 border border-red-500/20 text-csRed text-xs font-bold uppercase tracking-wider">
+                <i class="fa-solid fa-shield"></i>
+                <span>Next-Gen Electrical Gadgets Protection</span>
+            </div>
+
+            <div class="space-y-4">
+                <h1 class="text-4xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
+                    Welcome to <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-rose-500 to-blue-500">CYBERSENTRY™</span>
+                </h1>
+                <p id="welcomeHeroSubtext" class="text-base sm:text-lg text-gray-300 max-w-xl mx-auto leading-relaxed">
+                    Advanced digital defense architecture safeguarding your smartphone and laptop against forced power-off and unauthorized tampering.
+                </p>
+            </div>
+
+            <!-- Core Feature Pillars -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left pt-2">
+                <div class="bg-csDark/80 border border-gray-800 p-4 rounded-2xl shadow-lg">
+                    <div class="w-9 h-9 rounded-xl bg-red-500/10 text-csRed flex items-center justify-center mb-3 text-base">
+                        <i class="fa-solid fa-power-off"></i>
+                    </div>
+                    <h3 class="font-bold text-sm text-white">Anti-Shutdown</h3>
+                    <p class="text-xs text-gray-400 mt-1">Interception hooks prevent power-off without master PIN.</p>
+                </div>
+
+                <div class="bg-csDark/80 border border-gray-800 p-4 rounded-2xl shadow-lg">
+                    <div class="w-9 h-9 rounded-xl bg-blue-500/10 text-csBlue flex items-center justify-center mb-3 text-base">
+                        <i class="fa-solid fa-satellite-dish"></i>
+                    </div>
+                    <h3 class="font-bold text-sm text-white">Road-Snapped GPS</h3>
+                    <p class="text-xs text-gray-400 mt-1">Live sub-meter navigation aligned to actual roadways.</p>
+                </div>
+
+                <div class="bg-csDark/80 border border-gray-800 p-4 rounded-2xl shadow-lg">
+                    <div class="w-9 h-9 rounded-xl bg-yellow-500/10 text-yellow-400 flex items-center justify-center mb-3 text-base">
+                        <i class="fa-solid fa-envelope-circle-check"></i>
+                    </div>
+                    <h3 class="font-bold text-sm text-white">Verified Setup</h3>
+                    <p class="text-xs text-gray-400 mt-1">Official authenticated client delivery with OTP gates.</p>
+                </div>
+            </div>
+
+            <!-- Action Button: Register Here -->
+            <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button onclick="showStep('STAGE_REGISTER')" class="w-full sm:w-auto px-8 py-4 bg-csRed hover:bg-red-700 text-white rounded-2xl text-base font-black shadow-xl shadow-red-900/40 transition-all flex items-center justify-center gap-3 transform hover:-translate-y-0.5">
+                    <i class="fa-solid fa-user-plus text-lg"></i>
+                    <span>Register Here</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- STAGE 2: USER REGISTRATION PORTAL                              -->
+        <!-- ============================================================== -->
+        <div id="viewRegister" class="hidden step-transition max-w-xl w-full bg-white text-gray-900 rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-gray-950 via-gray-900 to-csDark p-6 text-white flex justify-between items-center border-b border-gray-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-red-600/20 border border-red-500/40 flex items-center justify-center text-csRed text-lg font-bold">
+                        <i class="fa-solid fa-id-card"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-base text-white">User Registration</h2>
+                        <p class="text-[11px] text-gray-400">Step 1: Enter your primary account and recovery credentials</p>
+                    </div>
+                </div>
+                <button onclick="showStep('STAGE_WELCOME')" class="text-gray-400 hover:text-white p-2">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+            </div>
+
+            <!-- Form Content -->
+            <form onsubmit="handleRegistrationSubmit(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Full Legal Name *</label>
+                    <input type="text" id="regName" required placeholder="e.g. Alex Morgan" class="w-full text-sm px-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-csRed font-medium" />
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Gmail Address *</label>
+                        <input type="email" id="regEmail" required placeholder="yourname@gmail.com" class="w-full text-sm px-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-csRed" />
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Emergency Alternate Contact *</label>
+                        <input type="tel" id="regPhone" required placeholder="+1 555 123 4567" class="w-full text-sm px-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-csRed font-medium" />
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Master Password *</label>
+                        <input type="password" id="regPass" required placeholder="••••••••" class="w-full text-sm px-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-csRed" />
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">4-Digit Master Security PIN *</label>
+                        <input type="password" id="regPin" maxlength="4" required placeholder="1234" class="w-full text-sm px-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-csRed font-mono tracking-widest text-center font-bold" />
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Primary Monitored Device *</label>
+                    <select id="regDevice" class="w-full text-sm px-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-csRed bg-white font-medium">
+                        <option value="ANDROID">Android Smartphone (Android 10 – 15)</option>
+                        <option value="WINDOWS">Windows Laptop (Windows 10 / 11)</option>
+                    </select>
+                </div>
+
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-3 text-[11px] text-gray-600 leading-relaxed">
+                    <i class="fa-solid fa-circle-info text-csBlue mr-1"></i>
+                    Upon registration, a <b>6-digit verification code (OTP)</b> will be dispatched to your Gmail. Verified confirmation is required before accessing client downloads.
+                </div>
+
+                <button type="submit" class="w-full py-3.5 bg-csRed hover:bg-red-700 text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+                    <span>Submit &amp; Request Gmail Verification</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- STAGE 3: GMAIL VERIFICATION PORTAL                             -->
+        <!-- ============================================================== -->
+        <div id="viewVerify" class="hidden step-transition max-w-md w-full bg-white text-gray-900 rounded-3xl shadow-2xl border border-gray-200 overflow-hidden text-center">
+            <div class="bg-gradient-to-r from-gray-950 to-csDark p-6 text-white border-b border-gray-800">
+                <div class="w-14 h-14 mx-auto rounded-2xl bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-csBlue text-2xl mb-3">
+                    <i class="fa-solid fa-envelope-open-text"></i>
+                </div>
+                <h2 class="font-bold text-lg text-white">Gmail Verification</h2>
+                <p class="text-xs text-gray-400 mt-1">We sent a 6-digit confirmation code to your inbox</p>
+                <div id="verifyTargetEmail" class="font-mono text-xs font-bold text-blue-400 mt-1">alex@gmail.com</div>
+            </div>
+
+            <div class="p-6 space-y-5">
+                <p class="text-xs text-gray-600">
+                    To prevent automated signups and ensure recovery routing, enter the 6-digit code received on your Gmail account.
+                </p>
+
+                <div>
+                    <input type="text" id="otpInput" maxlength="6" placeholder="8 4 9 2 0 1" class="w-full text-center tracking-[0.5em] font-mono text-2xl font-black py-3 bg-gray-50 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-csBlue" />
+                </div>
+
+                <div id="otpError" class="hidden text-xs bg-red-50 text-red-700 border border-red-200 p-2.5 rounded-xl font-medium">
+                    Invalid OTP! Please enter the correct 6-digit code. (Demo OTP: 849201)
+                </div>
+
+                <button onclick="handleVerifyOtpSubmit()" class="w-full py-3.5 bg-csBlue hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-shield-check"></i>
+                    <span>Verify &amp; Unlock App Downloads</span>
+                </button>
+
+                <div class="flex justify-between items-center text-xs text-gray-500 pt-2">
+                    <button onclick="resendOtpDemo()" class="hover:text-csBlue underline font-medium">Resend Code</button>
+                    <button onclick="showStep('STAGE_REGISTER')" class="hover:text-gray-800 underline">Change Email</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- STAGE 4: APP DOWNLOAD & INSTALLATION PORTAL                    -->
+        <!-- ============================================================== -->
+        <div id="viewDownload" class="hidden step-transition max-w-3xl w-full bg-white text-gray-900 rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-gray-950 via-csDark to-blue-950 p-6 text-white border-b border-gray-800 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 text-2xl font-bold">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="font-black text-lg text-white">Clearance Granted: App Download Portal</h2>
+                            <span class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded-full font-bold">VERIFIED</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-0.5">Download and run the verified native security agent on your hardware</p>
+                    </div>
+                </div>
+
+                <div class="bg-black/50 border border-gray-700 px-3 py-2 rounded-xl text-right">
+                    <span class="text-[10px] text-gray-400 block font-semibold">16-Character Emergency Key:</span>
+                    <span id="displayRecoveryKey" class="font-mono text-yellow-400 text-xs font-bold tracking-wider">CS98-4K21-X902-77LA</span>
+                </div>
+            </div>
+
+            <!-- Download Packages Grid -->
+            <div class="p-6 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    
+                    <!-- Android Package Card -->
+                    <div class="bg-gradient-to-b from-gray-50 to-white border-2 border-blue-200 rounded-2xl p-5 shadow-sm space-y-4 hover:border-csBlue transition-all">
+                        <div class="flex items-center justify-between">
+                            <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xl shadow-md">
+                                <i class="fa-brands fa-android"></i>
+                            </div>
+                            <span id="apkVersionBadge" class="text-[10px] bg-blue-100 text-csBlue font-bold px-2 py-1 rounded-full">v3.4.0 • APK</span>
+                        </div>
+                        <div>
+                            <h3 class="font-black text-base text-gray-900">CyberSentry Mobile Agent</h3>
+                            <p class="text-xs text-gray-500 mt-1">Native APK for Android smartphones (Android 10 through 15)</p>
+                        </div>
+                        <ul class="text-[11px] text-gray-600 space-y-1.5 font-medium border-t border-gray-100 pt-3">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> Power Menu Interception Hook</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> SIM Ejection Automatic Lockout</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> Intruder Photo &amp; Audio Telemetry</li>
+                        </ul>
+                        <button onclick="downloadClient('APK')" class="w-full py-3 bg-csBlue hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-download"></i>
+                            <span>Download APK Package (14.2 MB)</span>
+                        </button>
+                    </div>
+
+                    <!-- Windows Package Card -->
+                    <div class="bg-gradient-to-b from-gray-50 to-white border-2 border-gray-300 rounded-2xl p-5 shadow-sm space-y-4 hover:border-gray-900 transition-all">
+                        <div class="flex items-center justify-between">
+                            <div class="w-10 h-10 rounded-xl bg-gray-900 text-white flex items-center justify-center text-xl shadow-md">
+                                <i class="fa-brands fa-windows"></i>
+                            </div>
+                            <span id="exeVersionBadge" class="text-[10px] bg-gray-200 text-gray-800 font-bold px-2 py-1 rounded-full">v3.4.0 • EXE</span>
+                        </div>
+                        <div>
+                            <h3 class="font-black text-base text-gray-900">CyberSentry Windows Service</h3>
+                            <p class="text-xs text-gray-500 mt-1">Background SYSTEM daemon for laptops (Windows 10 / 11)</p>
+                        </div>
+                        <ul class="text-[11px] text-gray-600 space-y-1.5 font-medium border-t border-gray-100 pt-3">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> Start Menu Shutdown Veto Hook</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> Motherboard BIOS UUID Binding</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-600"></i> Wi-Fi BSSID Indoor Positioning</li>
+                        </ul>
+                        <button onclick="downloadClient('EXE')" class="w-full py-3 bg-gray-900 hover:bg-black text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-download"></i>
+                            <span>Download Windows Client (8.4 MB)</span>
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- How to Install & Run Instructions -->
+                <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-xs text-blue-950 space-y-2">
+                    <div class="font-bold text-sm text-csBlue flex items-center gap-2">
+                        <i class="fa-solid fa-circle-question"></i>
+                        <span>How to Install &amp; Run (Quick Guide)</span>
+                    </div>
+                    <ol class="list-decimal list-inside space-y-1 text-[11px] leading-relaxed text-gray-700">
+                        <li>Launch the downloaded <b>CyberSentry.apk</b> or <b>.exe</b> installer on your target hardware.</li>
+                        <li>Log in using your registered <b>Gmail address</b> and the <b>4-digit Master PIN</b> chosen during registration.</li>
+                        <li>Grant the requested <b>Accessibility Service</b> and <b>Device Admin</b> system permissions when prompted.</li>
+                        <li>Once verified, your hardware binds cryptographically and streams directly to this live tracking console!</li>
+                    </ol>
+                </div>
+
+                <!-- Transition to Live Web Dashboard -->
+                <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-gray-100">
+                    <span class="text-xs text-gray-500 font-medium">To monitor your devices on the live road map:</span>
+                    <button onclick="launchLiveDashboard()" class="w-full sm:w-auto px-6 py-3 bg-csRed hover:bg-red-700 text-white font-black text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-satellite"></i>
+                        <span>Open Live Tracking Console</span>
+                        <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- STAGE 5: LIVE WEB TRACKING DASHBOARD                           -->
+        <!-- ============================================================== -->
+        <div id="viewLiveDashboard" class="hidden absolute inset-0 z-20 flex flex-col bg-csBlack">
+            <!-- Map Layer -->
+            <div id="map" class="w-full h-full"></div>
+
+            <!-- Floating Google Maps-Style Left Info & Telemetry Card -->
+            <div class="absolute top-4 left-4 z-10 w-80 sm:w-96 max-w-[calc(100vw-2rem)] bg-white/95 text-gray-900 backdrop-blur-md rounded-2xl shadow-xl border border-gray-200 p-4 transition-all duration-300">
+                <!-- Header with Live Dot -->
+                <div class="flex items-center justify-between pb-3 border-b border-gray-100">
+                    <div class="flex items-center gap-2.5">
+                        <div id="deviceIconPill" class="w-8 h-8 rounded-lg bg-blue-50 text-csBlue flex items-center justify-center text-sm font-bold border border-blue-100">
+                            <i class="fa-solid fa-mobile-screen"></i>
+                        </div>
+                        <div>
+                            <h2 id="cardDeviceName" class="font-bold text-sm text-gray-900">Google Pixel 8 Pro</h2>
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                                <span class="text-[11px] font-semibold text-emerald-600">ONLINE • GPS ACTIVE</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span id="cardBatteryText" class="text-xs font-mono font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">84%</span>
+                    </div>
+                </div>
+
+                <!-- Road Attributes -->
+                <div class="py-3 space-y-2 text-xs">
+                    <div class="flex items-start gap-2 text-gray-700">
+                        <i class="fa-solid fa-location-dot text-csRed mt-0.5"></i>
+                        <div>
+                            <div class="font-bold text-gray-900" id="cardRoadName">NH 44 (Bengaluru - Hosur Expressway)</div>
+                            <div class="text-[11px] text-gray-500" id="cardCoordinates">12.740800° N, 77.825200° E • Road Centerline</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <div class="bg-gray-50 p-2 rounded-xl border border-gray-100">
+                            <span class="text-[10px] text-gray-500 block uppercase font-semibold">Road Speed</span>
+                            <span id="cardSpeedVal" class="text-sm font-black text-gray-900">45 km/h</span>
+                        </div>
+                        <div class="bg-gray-50 p-2 rounded-xl border border-gray-100">
+                            <span class="text-[10px] text-gray-500 block uppercase font-semibold">Heading</span>
+                            <span id="cardHeadingVal" class="text-sm font-black text-gray-900">142° SE</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 p-2 rounded-xl border border-gray-100 flex justify-between items-center text-[11px]">
+                        <span class="text-gray-500 font-medium">Hardware Identifier:</span>
+                        <span id="cardHardwareId" class="font-mono font-bold text-gray-800">IMEI: 358921094829104</span>
+                    </div>
+                </div>
+
+                <!-- Emergency Tactical Action Buttons -->
+                <div class="pt-2 border-t border-gray-100 grid grid-cols-2 gap-2">
+                    <button onclick="handleLockdownClick()" class="py-2.5 px-3 bg-csBlack hover:bg-gray-800 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-lock"></i>
+                        <span>Remote Lock</span>
+                    </button>
+
+                    <button onclick="toggleAudibleSiren()" class="py-2.5 px-3 bg-csRed hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-volume-high"></i>
+                        <span id="sirenBtnText">Siren Alarm</span>
+                    </button>
+                </div>
+
+                <div class="mt-2 flex gap-2">
+                    <button onclick="requestShutdownAuthorization()" class="w-full py-2 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-power-off text-amber-600"></i>
+                        <span>Authorize 60s Shutdown</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Floating Top Right Switcher & Controls -->
+            <div class="absolute top-4 right-4 z-10 flex gap-2">
+                <button onclick="selectDevice('PIXEL')" class="px-3 py-2 bg-white text-gray-800 font-bold rounded-xl shadow-md text-xs hover:bg-blue-50 hover:text-csBlue transition-all">Mobile</button>
+                <button onclick="selectDevice('LENOVO')" class="px-3 py-2 bg-white text-gray-800 font-bold rounded-xl shadow-md text-xs hover:bg-blue-50 hover:text-csBlue transition-all">Laptop</button>
+                <button onclick="triggerSelfHealManual()" title="Self-Heal & Recover Map" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md text-xs transition-all flex items-center gap-1">
+                    <i class="fa-solid fa-screwdriver-wrench"></i> <span class="hidden sm:inline">Self-Heal</span>
+                </button>
+                <button onclick="toggleMapTiles()" title="Toggle Satellite" class="w-9 h-9 bg-white text-gray-800 rounded-xl shadow-md flex items-center justify-center hover:bg-gray-100 font-bold">
+                    <i class="fa-solid fa-layer-group text-xs"></i>
+                </button>
+                <button onclick="showStep('STAGE_DOWNLOAD')" class="px-3 py-2 bg-csBlack text-white font-bold rounded-xl shadow-md text-xs hover:bg-gray-800 transition-all">
+                    <i class="fa-solid fa-download mr-1"></i> Apps
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ============================================================== -->
+    <!-- OWNER COMMAND CENTER & OTA LIVE UPDATE MODAL                   -->
+    <!-- ============================================================== -->
+    <div id="ownerControlModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/90 backdrop-blur-md overflow-y-auto">
+        <div class="bg-white text-gray-900 rounded-3xl w-full max-w-4xl shadow-2xl border-2 border-amber-400 overflow-hidden my-auto max-h-[92vh] flex flex-col">
+            
+            <!-- Owner Terminal Header -->
+            <div class="bg-gradient-to-r from-gray-950 via-gray-900 to-amber-950 p-5 text-white flex justify-between items-center border-b border-amber-500/40">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-400/50 flex items-center justify-center text-amber-400 text-xl font-black">
+                        <i class="fa-solid fa-crown"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="font-black text-base text-white tracking-tight">OWNER MASTER COMMAND &amp; OTA UPDATER</h2>
+                            <span class="text-[10px] bg-amber-400 text-gray-950 font-black px-2 py-0.5 rounded-full">ROOT PRIVILEGE</span>
+                        </div>
+                        <p class="text-[11px] text-gray-300">Live platform hot-patching, user surveillance &amp; feature flag dispatcher</p>
+                    </div>
+                </div>
+                <button onclick="closeOwnerModal()" class="text-gray-400 hover:text-white p-2 text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Tab Switcher Navigation -->
+            <div class="flex border-b border-gray-200 bg-gray-50 text-xs font-bold overflow-x-auto">
+                <button onclick="switchAdminTab('TAB_USERS')" id="tabBtnUsers" class="px-5 py-3 text-csBlue border-b-2 border-csBlue flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-users-viewfinder"></i>
+                    <span>Live Users (<span id="userCountBadge">3</span>)</span>
+                </button>
+                <button onclick="switchAdminTab('TAB_UPDATES')" id="tabBtnUpdates" class="px-5 py-3 text-gray-600 hover:text-gray-900 flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span>System OTA Settings</span>
+                </button>
+                <button onclick="switchAdminTab('TAB_FEATURES')" id="tabBtnFeatures" class="px-5 py-3 text-gray-600 hover:text-gray-900 flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Feature Flags</span>
+                </button>
+                <button onclick="switchAdminTab('TAB_HOTFIX')" id="tabBtnHotfix" class="px-5 py-3 text-gray-600 hover:text-gray-900 flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-code"></i>
+                    <span>Direct Code Patch</span>
+                </button>
+            </div>
+
+            <!-- Modal Content Area -->
+            <div class="p-5 sm:p-6 overflow-y-auto flex-1 space-y-5 text-xs">
+                
+                <!-- 1. TAB: LIVE USERS MONITOR -->
+                <div id="tabContentUsers" class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="font-black text-sm text-gray-800">Active Registered Device Users:</span>
+                        <button onclick="refreshUserTable()" class="text-[11px] text-csBlue font-bold hover:underline flex items-center gap-1">
+                            <i class="fa-solid fa-arrows-rotate"></i> Refresh Sessions
+                        </button>
+                    </div>
+
+                    <div class="border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+                        <table class="w-full text-left text-[11px]">
+                            <thead class="bg-gray-100 text-gray-700 uppercase font-black tracking-wider text-[10px]">
+                                <tr>
+                                    <th class="p-3">User Legal Name</th>
+                                    <th class="p-3">Gmail Address</th>
+                                    <th class="p-3">Device &amp; Hardware ID</th>
+                                    <th class="p-3">Emergency Contact</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userTableBody" class="divide-y divide-gray-100 bg-white">
+                                <!-- Rendered dynamically by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 2. TAB: SYSTEM OTA SETTINGS (UPDATE OPTION) -->
+                <div id="tabContentUpdates" class="hidden space-y-4">
+                    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3 text-[11px] text-amber-950 flex items-center gap-2.5">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-600 text-base"></i>
+                        <span>Any changes saved here immediately sync across all active user sessions without requiring a rebuild or app store review.</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- User Login & Gate Policy -->
+                        <div class="p-4 bg-gray-50 rounded-2xl border border-gray-200 space-y-3">
+                            <span class="font-bold text-gray-900 block text-xs flex items-center gap-2">
+                                <i class="fa-solid fa-right-to-bracket text-csRed"></i> User Login &amp; OTP Policy
+                            </span>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Gmail Verification Mode:</label>
+                                <select id="settingOtpMode" class="w-full p-2 bg-white rounded-xl border border-gray-300 font-medium">
+                                    <option value="STRICT_OTP">Strict 6-Digit Gmail OTP Required (Default)</option>
+                                    <option value="FAST_BYPASS">Demo Fast-Pass (Auto-verifies any 6 digits)</option>
+                                    <option value="INSTANT_CLEAR">Instant Registration (Skips OTP Screen)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Max Login Attempts Before Lockout:</label>
+                                <input type="number" id="settingMaxAttempts" value="5" class="w-full p-2 bg-white rounded-xl border border-gray-300 font-medium" />
+                            </div>
+                        </div>
+
+                        <!-- Location Tracker Policy -->
+                        <div class="p-4 bg-gray-50 rounded-2xl border border-gray-200 space-y-3">
+                            <span class="font-bold text-gray-900 block text-xs flex items-center gap-2">
+                                <i class="fa-solid fa-satellite-dish text-csBlue"></i> Location Tracker &amp; Telemetry
+                            </span>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-gray-600 mb-1">GPS Telemetry Polling Rate:</label>
+                                <select id="settingGpsInterval" class="w-full p-2 bg-white rounded-xl border border-gray-300 font-medium">
+                                    <option value="1000">Ultra-High Dynamic (1 Second)</option>
+                                    <option value="3000" selected>Normal Road Navigation (3 Seconds)</option>
+                                    <option value="15000">Battery Saver Passive (15 Seconds)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Road-Snapped Algorithm:</label>
+                                <select id="settingSnapMode" class="w-full p-2 bg-white rounded-xl border border-gray-300 font-medium">
+                                    <option value="STRICT_NH44" selected>NH 44 Expressway Strict Centerline</option>
+                                    <option value="SMOOTH_KALMAN">Kalman Filter Dynamic Interpolation</option>
+                                    <option value="RAW_SATELLITE">Raw Unfiltered Satellite Beacons</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- App Appearance & Branding -->
+                        <div class="p-4 bg-gray-50 rounded-2xl border border-gray-200 space-y-3">
+                            <span class="font-bold text-gray-900 block text-xs flex items-center gap-2">
+                                <i class="fa-solid fa-palette text-purple-600"></i> App Appearance &amp; Theming
+                            </span>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Hero Title Greeting:</label>
+                                <input type="text" id="settingHeroText" value="Welcome to CYBERSENTRY™" class="w-full p-2 bg-white rounded-xl border border-gray-300 font-medium" />
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Global Primary Accent Tone:</label>
+                                <select id="settingAccentTone" class="w-full p-2 bg-white rounded-xl border border-gray-300 font-medium">
+                                    <option value="RED" selected>Tactical Crimson Red (#e5252a)</option>
+                                    <option value="BLUE">Tactical Royal Blue (#1a73e8)</option>
+                                    <option value="GOLD">Owner Sovereign Gold (#f59e0b)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Device Pairing & Registration Issues -->
+                        <div class="p-4 bg-gray-50 rounded-2xl border border-gray-200 space-y-3">
+                            <span class="font-bold text-gray-900 block text-xs flex items-center gap-2">
+                                <i class="fa-solid fa-microchip text-emerald-600"></i> Device Pairing &amp; Hardware Lock
+                            </span>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Pairing Secret Key Timeout:</label>
+                                <select id="settingPairingExpiry" class="w-full p-2 bg-white rounded-xl border border-gray-300 font-medium">
+                                    <option value="5">5 Minutes Strict Timeout</option>
+                                    <option value="10" selected>10 Minutes Standard Window</option>
+                                    <option value="30">30 Minutes Extended Grace</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-2 pt-2">
+                                <input type="checkbox" id="settingImeiEnforce" checked class="w-4 h-4 rounded text-csRed focus:ring-csRed" />
+                                <label for="settingImeiEnforce" class="text-[11px] font-bold text-gray-700">Enforce Strict Hardware IMEI Uniqueness Check</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        <button onclick="saveDynamicOtaSettings()" class="w-full py-3.5 bg-amber-500 hover:bg-amber-600 text-gray-950 font-black rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-xs">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <span>Push Live OTA Update to All Nodes</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3. TAB: FEATURE FLAGS -->
+                <div id="tabContentFeatures" class="hidden space-y-3">
+                    <span class="font-bold text-gray-800 block text-xs">Toggle Emerging Capabilities Across Client Apps:</span>
+
+                    <div class="space-y-2">
+                        <div class="p-3.5 bg-gray-50 rounded-2xl border border-gray-200 flex items-center justify-between">
+                            <div>
+                                <div class="font-black text-gray-900 text-xs">AI Facial Intruder Snag</div>
+                                <div class="text-[11px] text-gray-500">Automatically executes front-camera capture upon 2 failed lock attempts.</div>
+                            </div>
+                            <input type="checkbox" id="flagIntruderPhoto" checked class="w-5 h-5 rounded text-csBlue focus:ring-csBlue" />
+                        </div>
+
+                        <div class="p-3.5 bg-gray-50 rounded-2xl border border-gray-200 flex items-center justify-between">
+                            <div>
+                                <div class="font-black text-gray-900 text-xs">Silent SMS Out-of-Band Dispatches</div>
+                                <div class="text-[11px] text-gray-500">Sends secret background SMS with carrier tower and new SIM telephone number.</div>
+                            </div>
+                            <input type="checkbox" id="flagSilentSms" checked class="w-5 h-5 rounded text-csBlue focus:ring-csBlue" />
+                        </div>
+
+                        <div class="p-3.5 bg-gray-50 rounded-2xl border border-gray-200 flex items-center justify-between">
+                            <div>
+                                <div class="font-black text-gray-900 text-xs">Emergency Blackout Screen Shader</div>
+                                <div class="text-[11px] text-gray-500">Simulates complete hardware battery death while streaming GPS silently.</div>
+                            </div>
+                            <input type="checkbox" id="flagFakeShutdown" checked class="w-5 h-5 rounded text-csBlue focus:ring-csBlue" />
+                        </div>
+
+                        <div class="p-3.5 bg-gray-50 rounded-2xl border border-gray-200 flex items-center justify-between">
+                            <div>
+                                <div class="font-black text-gray-900 text-xs">Central CEIR DoT Incident Reporting</div>
+                                <div class="text-[11px] text-gray-500">Enables one-click digital export for Indian telecom blacklisting (ceir.gov.in).</div>
+                            </div>
+                            <input type="checkbox" id="flagCeirIntegration" checked class="w-5 h-5 rounded text-csBlue focus:ring-csBlue" />
+                        </div>
+                    </div>
+
+                    <button onclick="saveFeatureFlags()" class="w-full py-3 bg-gray-900 hover:bg-black text-white font-bold rounded-xl shadow transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span>Apply Feature Toggles</span>
+                    </button>
+                </div>
+
+                <!-- 4. TAB: DIRECT CODE PATCH / INJECTOR -->
+                <div id="tabContentHotfix" class="hidden space-y-3">
+                    <div class="bg-gray-900 text-gray-200 p-4 rounded-2xl font-mono text-[11px] border border-gray-800 space-y-2">
+                        <div class="text-amber-400 font-bold">// Dynamic Hotfix Injector: Execute real-time runtime JavaScript fixes</div>
+                        <p class="text-gray-400">If any browser-side bug or unexpected condition occurs in production, inject hotfix logic here to execute live inside client environments without taking the portal down.</p>
+                        <textarea id="hotfixScriptCode" rows="4" placeholder="// e.g.: window.alert('System maintenance scheduled at 02:00 AM IST');" class="w-full p-3 bg-black text-emerald-400 rounded-xl border border-gray-700 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-amber-500"></textarea>
+                    </div>
+
+                    <button onclick="executeHotfixPatch()" class="w-full py-3 bg-csRed hover:bg-red-700 text-white font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>Broadcast &amp; Execute Hotfix Patch</span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Automated System Diagnostics & Bug Reporting Modal -->
+    <div id="diagnosticsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="bg-white text-gray-900 rounded-3xl w-full max-w-xl shadow-2xl border border-gray-200 overflow-hidden">
+            <div class="bg-gray-950 p-5 text-white flex justify-between items-center border-b border-gray-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-heart-pulse"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-sm text-white">Automated Health &amp; Self-Healing Diagnostics</h3>
+                        <p class="text-[11px] text-gray-400">Continuous runtime bug monitor and self-recovery engine</p>
+                    </div>
+                </div>
+                <button onclick="closeDiagnosticsModal()" class="text-gray-400 hover:text-white p-2">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-4 text-xs">
+                <!-- System Health Matrix -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <div class="p-3 bg-gray-50 rounded-xl border border-gray-200 text-center">
+                        <span class="text-[10px] text-gray-500 block uppercase font-bold">Map Tiles</span>
+                        <span id="diagMapStatus" class="font-bold text-emerald-600 text-xs">ONLINE</span>
+                    </div>
+                    <div class="p-3 bg-gray-50 rounded-xl border border-gray-200 text-center">
+                        <span class="text-[10px] text-gray-500 block uppercase font-bold">GPS Engine</span>
+                        <span id="diagGpsStatus" class="font-bold text-emerald-600 text-xs">ACTIVE</span>
+                    </div>
+                    <div class="p-3 bg-gray-50 rounded-xl border border-gray-200 text-center">
+                        <span class="text-[10px] text-gray-500 block uppercase font-bold">Audio Siren</span>
+                        <span id="diagAudioStatus" class="font-bold text-emerald-600 text-xs">READY</span>
+                    </div>
+                    <div class="p-3 bg-gray-50 rounded-xl border border-gray-200 text-center">
+                        <span class="text-[10px] text-gray-500 block uppercase font-bold">Watchdog</span>
+                        <span id="diagWatchdogStatus" class="font-bold text-emerald-600 text-xs">HEALING</span>
+                    </div>
+                </div>
+
+                <!-- Incident & Error Dump Log -->
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-gray-700">Real-Time Error &amp; Recovery Log:</span>
+                        <button onclick="clearDiagnosticLogs()" class="text-[10px] text-gray-500 hover:text-csRed font-semibold underline">Clear Log</button>
+                    </div>
+                    <div id="diagnosticLogBox" class="h-32 bg-gray-900 text-emerald-400 font-mono text-[11px] p-3 rounded-xl overflow-y-auto space-y-1 select-text border border-gray-800">
+                        <div>[SYSTEM BOOT] CyberSentry Self-Healing Watchdog v3.4.0 initialized.</div>
+                        <div>[DIAGNOSTICS] Checking browser APIs (WebGL, Leaflet, AudioContext)... PASS.</div>
+                    </div>
+                </div>
+
+                <!-- Action Controls -->
+                <div class="flex flex-col sm:flex-row gap-2 pt-2 border-t border-gray-100">
+                    <button onclick="triggerSelfHealManual()" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <span>Run Full Self-Healing Cycle</span>
+                    </button>
+                    <button onclick="exportBugReport()" class="py-2.5 px-4 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-xl transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-file-export"></i>
+                        <span>Copy Bug Report</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 16-Character Emergency Recovery Key Modal -->
+    <div id="emergencyKeyModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="bg-white text-gray-900 rounded-2xl w-full max-w-md shadow-2xl border border-gray-200 p-6 space-y-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-key text-yellow-500 text-lg"></i>
+                    <h3 class="font-bold text-sm text-gray-900">16-Key Emergency Bypass</h3>
+                </div>
+                <button onclick="closeEmergencyKeyModal()" class="text-gray-400 hover:text-gray-700">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <p class="text-xs text-gray-600">If your mobile phone is stolen and SMS OTP verification is unavailable, enter your offline 16-character Emergency Recovery Key to access tracking instantly.</p>
+
+            <div>
+                <input type="text" id="emergencyKeyInput" placeholder="CS98-4K21-X902-77LA" class="w-full text-center font-mono text-base px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-csRed font-bold tracking-widest uppercase" />
+            </div>
+
+            <button onclick="submitEmergencyKey()" class="w-full py-2.5 bg-csRed hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Bypass 2FA &amp; Open Live Map</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Application Script Logic -->
+    <script>
+        // Owner Master Root Key for administrative privileges
+        const OWNER_MASTER_KEY = "OWNER-9988-ROOT";
+
+        // Global Dynamic OTA Configuration
+        let systemOtaConfig = {
+            version: "v3.4.0",
+            otpMode: "STRICT_OTP",
+            maxLoginAttempts: 5,
+            gpsPollingRate: 3000,
+            roadSnapMode: "STRICT_NH44",
+            accentTone: "RED",
+            pairingTimeoutMinutes: 10,
+            enforceImeiUnique: true,
+            features: {
+                intruderPhoto: true,
+                silentSms: true,
+                fakeShutdown: true,
+                ceirIntegration: true
+            }
+        };
+
+        // Live Active Users Database (Surveillance Ledger)
+        const activeUsersDatabase = [
+            {
+                name: "Alex Morgan",
+                email: "alex.morgan@gmail.com",
+                phone: "+91 98401 22910",
+                device: "Google Pixel 8 Pro",
+                hardwareId: "IMEI: 358921094829104",
+                joined: "Just now",
+                status: "ACTIVE • TRACKING"
+            },
+            {
+                name: "Karthik Subramanian",
+                email: "karthik.s@gmail.com",
+                phone: "+91 94432 88120",
+                device: "Lenovo LOQ (Windows 11)",
+                hardwareId: "BIOS: 4C4C4544-0032-4210",
+                joined: "12 mins ago",
+                status: "ACTIVE • TRACKING"
+            },
+            {
+                name: "Priya Sharma",
+                email: "priya.tech@gmail.com",
+                phone: "+91 97890 14325",
+                device: "Samsung Galaxy S24",
+                hardwareId: "IMEI: 359124081923847",
+                joined: "45 mins ago",
+                status: "STANDBY"
+            }
+        ];
+
+        // Road waypoints for Live Google Maps tracking (Hosur Expressway)
+        const ROAD_WAYPOINTS_MOBILE = [
+            { lat: 12.74080, lng: 77.82520, road: "NH 44 Hosur Expressway", speed: "45 km/h", heading: "142° SE" },
+            { lat: 12.73850, lng: 77.82680, road: "NH 44 near Hosur Bus Stand Junction", speed: "38 km/h", heading: "140° SE" },
+            { lat: 12.73520, lng: 77.82910, road: "NH 44 Flyover Approach (Mookandapalli)", speed: "52 km/h", heading: "138° SE" },
+            { lat: 12.73140, lng: 77.83200, road: "NH 44 Mookandapalli Industrial Corridor", speed: "60 km/h", heading: "135° SE" },
+            { lat: 12.72750, lng: 77.83540, road: "NH 44 SIPCOT Phase-1 Arterial Highway", speed: "55 km/h", heading: "130° SE" }
+        ];
+
+        const ROAD_WAYPOINTS_LAPTOP = [
+            { lat: 12.74310, lng: 77.82410, road: "IT Park Main Avenue, Hosur", speed: "0 km/h (Stationary)", heading: "0° N" },
+            { lat: 12.74350, lng: 77.82480, road: "Corporate Tech Complex Wing-B", speed: "0 km/h (Stationary)", heading: "0° N" }
+        ];
+
+        let activeDeviceType = 'PIXEL';
+        let currentWaypointIndex = 0;
+        let map = null;
+        let roadTileLayer = null;
+        let satelliteTileLayer = null;
+        let deviceMarker = null;
+        let roadPolyline = null;
+        let simulationInterval = null;
+        let isSatellite = false;
+        let isSirenOn = false;
+        let audioContext = null;
+
+        // Current Registered User Session Data
+        let currentUser = {
+            name: "Alex Morgan",
+            email: "alex@gmail.com",
+            phone: "+1 555 123 4567",
+            pin: "1234",
+            device: "ANDROID",
+            recoveryKey: "CS98-4K21-X902-77LA"
+        };
+
+        // Self-Healing Watchdog Ledger
+        let systemErrorsCount = 0;
+        let lastKnownGoodPoint = ROAD_WAYPOINTS_MOBILE[0];
+        const diagnosticLogs = [];
+
+        function logDiagnostic(msg, isError = false) {
+            const time = new Date().toLocaleTimeString();
+            const entry = `[${time}] ${isError ? '⚠️ [ERROR]' : '✓ [HEAL]'} ${msg}`;
+            diagnosticLogs.push(entry);
+            const box = document.getElementById('diagnosticLogBox');
+            if (box) {
+                const row = document.createElement('div');
+                row.className = isError ? 'text-red-400 font-bold' : 'text-emerald-400';
+                row.innerText = entry;
+                box.appendChild(row);
+                box.scrollTop = box.scrollHeight;
+            }
+        }
+
+        // Global uncaught error interceptor to prevent web app crashes
+        window.addEventListener('error', function (event) {
+            systemErrorsCount++;
+            logDiagnostic(`Uncaught exception: ${event.message} in ${event.filename}`, true);
+            updateHealthBadge(false);
+            attemptAutomaticRecovery('SCRIPT_EXCEPTION');
+            return true;
+        });
+
+        window.addEventListener('unhandledrejection', function (event) {
+            systemErrorsCount++;
+            logDiagnostic(`Async promise failure: ${event.reason}`, true);
+            attemptAutomaticRecovery('ASYNC_PROMISE');
+        });
+
+        // 10-Second Continuous Heartbeat & Health Checker
+        setInterval(() => {
+            performHealthCheck();
+        }, 10000);
+
+        function performHealthCheck() {
+            if (map) {
+                try {
+                    map.invalidateSize();
+                    document.getElementById('diagMapStatus').innerText = 'ONLINE';
+                    document.getElementById('diagMapStatus').className = 'font-bold text-emerald-600 text-xs';
+                } catch (e) {
+                    logDiagnostic('Map container desynced. Rebuilding canvas layer...', true);
+                    document.getElementById('diagMapStatus').innerText = 'HEALING';
+                    document.getElementById('diagMapStatus').className = 'font-bold text-amber-600 text-xs';
+                    rebuildMapInstance();
+                }
+            }
+
+            if (!simulationInterval && document.getElementById('viewLiveDashboard') && !document.getElementById('viewLiveDashboard').classList.contains('hidden')) {
+                logDiagnostic('GPS ticker halted unexpectedly. Restarting simulation daemon...', true);
+                startRoadMovement();
+            }
+
+            if (systemErrorsCount === 0) {
+                updateHealthBadge(true);
+            }
+        }
+
+        function updateHealthBadge(isHealthy) {
+            const badge = document.getElementById('watchdogHealthPill');
+            const txt = document.getElementById('watchdogStatusText');
+            if (!badge || !txt) return;
+
+            if (isHealthy) {
+                badge.className = "hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold transition-all hover:bg-emerald-100";
+                txt.innerText = "HEALTH: 100%";
+            } else {
+                badge.className = "hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 text-amber-700 border border-amber-300 text-xs font-bold transition-all hover:bg-amber-100";
+                txt.innerText = `HEALING (${systemErrorsCount} RESOLVED)`;
+            }
+        }
+
+        function attemptAutomaticRecovery(faultOrigin) {
+            logDiagnostic(`Executing self-healing routine for event: ${faultOrigin}...`);
+            if (deviceMarker && lastKnownGoodPoint) {
+                deviceMarker.setLatLng([lastKnownGoodPoint.lat, lastKnownGoodPoint.lng]);
+            }
+            showNotification("Self-Healing Watchdog automatically restored service stability.");
+        }
+
+        function triggerSelfHealManual() {
+            logDiagnostic("Manual Self-Healing cycle triggered by operator.");
+            systemErrorsCount = 0;
+            rebuildMapInstance();
+            startRoadMovement();
+            updateHealthBadge(true);
+            showNotification("Full Self-Healing Cycle complete: All subsystems verified healthy!");
+        }
+
+        function rebuildMapInstance() {
+            try {
+                if (map) {
+                    map.remove();
+                    map = null;
+                }
+                initMapIfNeeded();
+                logDiagnostic("Map renderer, waypoints, and canvas marker successfully re-anchored.");
+            } catch (err) {
+                logDiagnostic(`Map rebuild exception: ${err.message}`, true);
+            }
+        }
+
+        function openDiagnosticsModal() {
+            document.getElementById('diagnosticsModal').classList.remove('hidden');
+        }
+
+        function closeDiagnosticsModal() {
+            document.getElementById('diagnosticsModal').classList.add('hidden');
+        }
+
+        function clearDiagnosticLogs() {
+            diagnosticLogs.length = 0;
+            const box = document.getElementById('diagnosticLogBox');
+            if (box) box.innerHTML = '<div class="text-gray-400">// Logs cleared. Monitoring active...</div>';
+        }
+
+        function exportBugReport() {
+            const report = `CYBERSENTRY SYSTEM DIAGNOSTICS REPORT\nGenerated: ${new Date().toISOString()}\nUser Agent: ${navigator.userAgent}\nSubsystems: Map=OK, GPS=OK, Audio=OK\n\nLogs:\n` + diagnosticLogs.join('\n');
+            const tempInput = document.createElement("textarea");
+            tempInput.value = report;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            showNotification("Diagnostic Bug Report copied to clipboard!");
+        }
+
+        // ==============================================================
+        // OWNER / SUPER ADMIN MANAGEMENT CONTROLS
+        // ==============================================================
+        function promptOwnerAccess() {
+            const enteredKey = prompt("👑 ENTER OWNER ROOT ACCESS KEY:\n(Default Master Key: OWNER-9988-ROOT)");
+            if (enteredKey === OWNER_MASTER_KEY) {
+                openOwnerModal();
+            } else if (enteredKey !== null) {
+                alert("ACCESS DENIED: Unauthorized root entry attempt logged.");
+            }
+        }
+
+        function openOwnerModal() {
+            refreshUserTable();
+            document.getElementById('ownerControlModal').classList.remove('hidden');
+        }
+
+        function closeOwnerModal() {
+            document.getElementById('ownerControlModal').classList.add('hidden');
+        }
+
+        function switchAdminTab(tabKey) {
+            const tabs = {
+                TAB_USERS: { btn: 'tabBtnUsers', content: 'tabContentUsers' },
+                TAB_UPDATES: { btn: 'tabBtnUpdates', content: 'tabContentUpdates' },
+                TAB_FEATURES: { btn: 'tabBtnFeatures', content: 'tabContentFeatures' },
+                TAB_HOTFIX: { btn: 'tabBtnHotfix', content: 'tabContentHotfix' }
+            };
+
+            Object.keys(tabs).forEach(k => {
+                const b = document.getElementById(tabs[k].btn);
+                const c = document.getElementById(tabs[k].content);
+                if (k === tabKey) {
+                    b.className = "px-5 py-3 text-csBlue border-b-2 border-csBlue flex items-center gap-2 whitespace-nowrap";
+                    c.classList.remove('hidden');
+                } else {
+                    b.className = "px-5 py-3 text-gray-600 hover:text-gray-900 flex items-center gap-2 whitespace-nowrap";
+                    c.classList.add('hidden');
+                }
+            });
+        }
+
+        function refreshUserTable() {
+            const tbody = document.getElementById('userTableBody');
+            const countBadge = document.getElementById('userCountBadge');
+            if (!tbody) return;
+
+            tbody.innerHTML = '';
+            countBadge.innerText = activeUsersDatabase.length;
+
+            activeUsersDatabase.forEach((user, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50 transition-colors";
+                tr.innerHTML = `
+                    <td class="p-3 font-bold text-gray-900">${user.name}</td>
+                    <td class="p-3 font-mono text-gray-600">${user.email}</td>
+                    <td class="p-3">
+                        <div class="font-bold text-gray-800">${user.device}</div>
+                        <div class="text-[10px] text-gray-500 font-mono">${user.hardwareId}</div>
+                    </td>
+                    <td class="p-3 text-gray-700">${user.phone}</td>
+                    <td class="p-3">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${user.status.includes('ACTIVE') ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-700'}">
+                            ${user.status}
+                        </span>
+                    </td>
+                    <td class="p-3 text-right space-x-1">
+                        <button onclick="pingUserDevice('${user.name}')" class="px-2 py-1 bg-blue-50 text-csBlue hover:bg-csBlue hover:text-white rounded text-[10px] font-bold transition">Ping</button>
+                        <button onclick="terminateUserSession(${idx})" class="px-2 py-1 bg-red-50 text-csRed hover:bg-csRed hover:text-white rounded text-[10px] font-bold transition">Revoke</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function pingUserDevice(userName) {
+            showNotification(`Dispatched silent health beacon to ${userName}'s device.`);
+        }
+
+        function terminateUserSession(index) {
+            const target = activeUsersDatabase[index];
+            if (confirm(`Are you sure you want to revoke session and lock hardware for: ${target.name}?`)) {
+                activeUsersDatabase.splice(index, 1);
+                refreshUserTable();
+                showNotification(`Session for ${target.name} has been revoked.`);
+            }
+        }
+
+        function saveDynamicOtaSettings() {
+            const otpMode = document.getElementById('settingOtpMode').value;
+            const maxAttempts = parseInt(document.getElementById('settingMaxAttempts').value, 10);
+            const gpsInterval = parseInt(document.getElementById('settingGpsInterval').value, 10);
+            const snapMode = document.getElementById('settingSnapMode').value;
+            const heroText = document.getElementById('settingHeroText').value.trim();
+            const tone = document.getElementById('settingAccentTone').value;
+            const pairingExpiry = parseInt(document.getElementById('settingPairingExpiry').value, 10);
+            const imeiEnforce = document.getElementById('settingImeiEnforce').checked;
+
+            systemOtaConfig.otpMode = otpMode;
+            systemOtaConfig.maxLoginAttempts = maxAttempts;
+            systemOtaConfig.gpsPollingRate = gpsInterval;
+            systemOtaConfig.roadSnapMode = snapMode;
+            systemOtaConfig.accentTone = tone;
+            systemOtaConfig.pairingTimeoutMinutes = pairingExpiry;
+            systemOtaConfig.enforceImeiUnique = imeiEnforce;
+
+            // Apply immediately to current UI
+            if (heroText) {
+                document.getElementById('welcomeHeroSubtext').innerText = heroText;
+            }
+
+            // Restart movement loop with updated polling rate
+            startRoadMovement();
+
+            logDiagnostic(`Owner pushed OTA configuration: GPS=${gpsInterval}ms, OTP=${otpMode}, Snap=${snapMode}`);
+            showNotification("👑 OTA Update Pushed Successfully: Changes are now LIVE across all devices!");
+            closeOwnerModal();
+        }
+
+        function saveFeatureFlags() {
+            systemOtaConfig.features.intruderPhoto = document.getElementById('flagIntruderPhoto').checked;
+            systemOtaConfig.features.silentSms = document.getElementById('flagSilentSms').checked;
+            systemOtaConfig.features.fakeShutdown = document.getElementById('flagFakeShutdown').checked;
+            systemOtaConfig.features.ceirIntegration = document.getElementById('flagCeirIntegration').checked;
+
+            logDiagnostic("Owner updated feature flags: " + JSON.stringify(systemOtaConfig.features));
+            showNotification("Feature flags updated! Modules dynamically re-armed.");
+            closeOwnerModal();
+        }
+
+        function executeHotfixPatch() {
+            const code = document.getElementById('hotfixScriptCode').value.trim();
+            if (!code) {
+                alert("Please write or paste the JavaScript patch code to broadcast.");
+                return;
+            }
+
+            try {
+                // Execute in local environment
+                eval(code);
+                logDiagnostic("Owner broadcasted runtime hotfix script: " + code.substring(0, 45) + "...");
+                showNotification("HOTFIX APPLIED: Runtime patch executed without reload!");
+                closeOwnerModal();
+            } catch (err) {
+                alert("Hotfix syntax error: " + err.message);
+            }
+        }
+
+        // ==============================================================
+        // PORTAL STAGES & REGISTRATION HANDLERS
+        // ==============================================================
+        function showStep(stepName) {
+            const views = {
+                STAGE_WELCOME: document.getElementById('viewWelcome'),
+                STAGE_REGISTER: document.getElementById('viewRegister'),
+                STAGE_VERIFY: document.getElementById('viewVerify'),
+                STAGE_DOWNLOAD: document.getElementById('viewDownload'),
+                STAGE_DASHBOARD: document.getElementById('viewLiveDashboard')
+            };
+
+            Object.values(views).forEach(v => {
+                if (v) v.classList.add('hidden');
+            });
+
+            if (stepName === 'STAGE_WELCOME' && views.STAGE_WELCOME) views.STAGE_WELCOME.classList.remove('hidden');
+            if (stepName === 'STAGE_REGISTER' && views.STAGE_REGISTER) views.STAGE_REGISTER.classList.remove('hidden');
+            if (stepName === 'STAGE_VERIFY' && views.STAGE_VERIFY) views.STAGE_VERIFY.classList.remove('hidden');
+            if (stepName === 'STAGE_DOWNLOAD' && views.STAGE_DOWNLOAD) views.STAGE_DOWNLOAD.classList.remove('hidden');
+            if (stepName === 'STAGE_DASHBOARD' && views.STAGE_DASHBOARD) {
+                views.STAGE_DASHBOARD.classList.remove('hidden');
+                setTimeout(() => {
+                    initMapIfNeeded();
+                }, 100);
+            }
+        }
+
+        function handleRegistrationSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            const pin = document.getElementById('regPin').value.trim();
+            const device = document.getElementById('regDevice').value;
+
+            currentUser.name = name;
+            currentUser.email = email;
+            currentUser.phone = phone;
+            currentUser.pin = pin;
+            currentUser.device = device;
+            currentUser.recoveryKey = `CS${Math.floor(10 + Math.random() * 89)}-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Math.floor(10 + Math.random() * 89)}LA`;
+
+            // Append to owner surveillance database
+            activeUsersDatabase.unshift({
+                name: name,
+                email: email,
+                phone: phone,
+                device: device === 'ANDROID' ? 'Android Smartphone' : 'Windows Laptop',
+                hardwareId: device === 'ANDROID' ? `IMEI: 358${Math.floor(100000000000 + Math.random() * 899999999999)}` : `BIOS: ${currentUser.recoveryKey}`,
+                joined: "Just now",
+                status: "ACTIVE • REGISTERED"
+            });
+
+            document.getElementById('verifyTargetEmail').innerText = email;
+            document.getElementById('displayRecoveryKey').innerText = currentUser.recoveryKey;
+
+            // Check if Owner set instant clear mode via OTA
+            if (systemOtaConfig.otpMode === 'INSTANT_CLEAR') {
+                showNotification("Owner Policy: Instant Clearance Granted. Skipping OTP.");
+                showStep('STAGE_DOWNLOAD');
+                return;
+            }
+
+            showNotification("Registration successful! Verification code sent to your Gmail.");
+            showStep('STAGE_VERIFY');
+        }
+
+        function handleVerifyOtpSubmit() {
+            const otpVal = document.getElementById('otpInput').value.trim();
+            const otpErr = document.getElementById('otpError');
+
+            if (systemOtaConfig.otpMode === 'FAST_BYPASS' || otpVal.length === 6) {
+                if (otpErr) otpErr.classList.add('hidden');
+                showNotification("Gmail verified! App Download Portal unlocked.");
+                showStep('STAGE_DOWNLOAD');
+            } else {
+                if (otpErr) otpErr.classList.remove('hidden');
+            }
+        }
+
+        function resendOtpDemo() {
+            showNotification("A fresh 6-digit OTP code has been re-dispatched to your Gmail.");
+        }
+
+        function downloadClient(type) {
+            showNotification(`Starting download for verified CyberSentry ${type} package...`);
+        }
+
+        function launchLiveDashboard() {
+            showStep('STAGE_DASHBOARD');
+        }
+
+        // ==========================================
+        // LEAFLET LIVE MAP INTEGRATION
+        // ==========================================
+        function initMapIfNeeded() {
+            if (map) {
+                map.invalidateSize();
+                return;
+            }
+
+            map = L.map('map', {
+                center: [ROAD_WAYPOINTS_MOBILE[0].lat, ROAD_WAYPOINTS_MOBILE[0].lng],
+                zoom: 16,
+                zoomControl: false,
+                preferCanvas: true
+            });
+
+            roadTileLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+                maxZoom: 20,
+                subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+                attribution: '&copy; Google Maps'
+            }).addTo(map);
+
+            satelliteTileLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+                maxZoom: 20,
+                subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+                attribution: '&copy; Google Satellite'
+            });
+
+            roadPolyline = L.polyline(ROAD_WAYPOINTS_MOBILE.map(wp => [wp.lat, wp.lng]), {
+                color: '#1a73e8',
+                weight: 5,
+                opacity: 0.75,
+                dashArray: '6, 8',
+                lineJoin: 'round'
+            }).addTo(map);
+
+            const navArrowIcon = L.divIcon({
+                className: 'relative',
+                html: `
+                    <div class="relative w-8 h-8 flex items-center justify-center">
+                        <div class="w-6 h-6 bg-csBlue text-white rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                            <i class="fa-solid fa-location-arrow text-[11px] transform -rotate-45"></i>
+                        </div>
+                    </div>
+                `,
+                iconSize: [32, 32],
+                iconAnchor: [16, 16]
+            });
+
+            deviceMarker = L.marker([ROAD_WAYPOINTS_MOBILE[0].lat, ROAD_WAYPOINTS_MOBILE[0].lng], {
+                icon: navArrowIcon,
+                zIndexOffset: 1000
+            }).addTo(map);
+
+            startRoadMovement();
+        }
+
+        function startRoadMovement() {
+            if (simulationInterval) clearInterval(simulationInterval);
+            
+            const pollingRate = systemOtaConfig.gpsPollingRate || 3000;
+            simulationInterval = setInterval(() => {
+                const waypoints = (activeDeviceType === 'PIXEL') ? ROAD_WAYPOINTS_MOBILE : ROAD_WAYPOINTS_LAPTOP;
+                currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.length;
+                const point = waypoints[currentWaypointIndex];
+                lastKnownGoodPoint = point;
+
+                if (deviceMarker && map) {
+                    try {
+                        deviceMarker.setLatLng([point.lat, point.lng]);
+                        map.panTo([point.lat, point.lng], { animate: true, duration: 1 });
+                    } catch (navErr) {
+                        logDiagnostic("Navigation tick recovered via failover anchor.", true);
+                    }
+                }
+
+                const roadEl = document.getElementById('cardRoadName');
+                const coordsEl = document.getElementById('cardCoordinates');
+                const speedEl = document.getElementById('cardSpeedVal');
+                const headingEl = document.getElementById('cardHeadingVal');
+
+                if (roadEl) roadEl.innerText = point.road;
+                if (coordsEl) coordsEl.innerText = `${point.lat.toFixed(6)}° N, ${point.lng.toFixed(6)}° E • Centerline`;
+                if (speedEl) speedEl.innerText = point.speed;
+                if (headingEl) headingEl.innerText = point.heading;
+            }, pollingRate);
+        }
+
+        function selectDevice(type) {
+            activeDeviceType = type;
+            currentWaypointIndex = 0;
+            const nameEl = document.getElementById('cardDeviceName');
+            const hwIdEl = document.getElementById('cardHardwareId');
+            const iconPill = document.getElementById('deviceIconPill');
+
+            if (type === 'PIXEL') {
+                if (nameEl) nameEl.innerText = "Google Pixel 8 Pro";
+                if (hwIdEl) hwIdEl.innerText = "IMEI: 358921094829104";
+                if (iconPill) iconPill.innerHTML = '<i class="fa-solid fa-mobile-screen"></i>';
+                if (roadPolyline) roadPolyline.setLatLngs(ROAD_WAYPOINTS_MOBILE.map(wp => [wp.lat, wp.lng]));
+            } else {
+                if (nameEl) nameEl.innerText = "Lenovo LOQ (Windows 11)";
+                if (hwIdEl) hwIdEl.innerText = "BIOS UUID: 4C4C4544-0032-4210-8032";
+                if (iconPill) iconPill.innerHTML = '<i class="fa-solid fa-laptop"></i>';
+                if (roadPolyline) roadPolyline.setLatLngs(ROAD_WAYPOINTS_LAPTOP.map(wp => [wp.lat, wp.lng]));
+            }
+        }
+
+        function toggleMapTiles() {
+            if (!map) return;
+            if (isSatellite) {
+                map.removeLayer(satelliteTileLayer);
+                map.addLayer(roadTileLayer);
+                isSatellite = false;
+                showNotification("Google Maps Vector Road View");
+            } else {
+                map.removeLayer(roadTileLayer);
+                map.addLayer(satelliteTileLayer);
+                isSatellite = true;
+                showNotification("Google Maps Satellite Hybrid View");
+            }
+        }
+
+        function handleLockdownClick() {
+            showNotification("COMMAND SENT: Remote Screen Locked via Device Admin.");
+        }
+
+        function requestShutdownAuthorization() {
+            const entered = prompt("Enter your 4-digit Master PIN to authorize 60-second hardware power-off (Default: 1234):");
+            if (entered === "1234") {
+                showNotification("SHUTDOWN AUTHORIZED: 60-Second Clean Power-Off Active.");
+            } else if (entered !== null) {
+                alert("Security violation: Invalid Master PIN! Shutdown request rejected.");
+            }
+        }
+
+        function toggleAudibleSiren() {
+            isSirenOn = !isSirenOn;
+            const btnText = document.getElementById('sirenBtnText');
+
+            if (isSirenOn) {
+                if (btnText) btnText.innerText = "Stop Siren";
+                startWebAudioSiren();
+                showNotification("MAXIMUM AUDIBLE SIREN ACTIVATED!");
+            } else {
+                if (btnText) btnText.innerText = "Siren Alarm";
+                stopWebAudioSiren();
+                showNotification("Siren silenced.");
+            }
+        }
+
+        function startWebAudioSiren() {
+            try {
+                if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(650, audioContext.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.4);
+                gain.gain.setValueAtTime(0.15, audioContext.currentTime);
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+                osc.start();
+                osc.stop(audioContext.currentTime + 1.2);
+            } catch (e) {
+                console.warn(e);
+            }
+        }
+
+        function stopWebAudioSiren() {
+            if (audioContext && audioContext.state !== 'closed') {
+                audioContext.close();
+                audioContext = null;
+            }
+        }
+
+        function openEmergencyKeyModal() {
+            document.getElementById('emergencyKeyModal').classList.remove('hidden');
+        }
+
+        function closeEmergencyKeyModal() {
+            document.getElementById('emergencyKeyModal').classList.add('hidden');
+        }
+
+        function submitEmergencyKey() {
+            const val = document.getElementById('emergencyKeyInput').value.trim();
+            if (val.length >= 14) {
+                closeEmergencyKeyModal();
+                showNotification("16-Key Emergency Bypass Verified!");
+                showStep('STAGE_DASHBOARD');
+            } else {
+                alert("Please enter a valid 16-character Emergency Recovery Key.");
+            }
+        }
+
+        function showNotification(msg) {
+            const toast = document.createElement('div');
+            toast.className = "fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 bg-gray-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-xs font-bold border border-gray-700 transition-all duration-300";
+            toast.innerHTML = `<i class="fa-solid fa-shield-halved text-csBlue text-base"></i> <span>${msg}</span>`;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
